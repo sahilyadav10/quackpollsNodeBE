@@ -5,6 +5,7 @@ import { Request, Response, NextFunction } from "express";
 
 import User from "../models/user.model.js";
 import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/env.js";
+import AppError from "../utils/appError.js";
 
 interface CustomError extends Error {
   statusCode?: number;
@@ -78,9 +79,7 @@ export const signIn = async (
     const user = await User.findOne({ email });
 
     if (!user) {
-      const error = new Error("User not found") as CustomError;
-      error.statusCode = 404;
-      throw error;
+      throw AppError.notFound("User not found");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
